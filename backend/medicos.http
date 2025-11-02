@@ -1,0 +1,33 @@
+@url=http://localhost:3000
+
+### Listado de medicos
+GET {{url}}/medicos
+
+
+### Detalles de producto
+GET {{url}}/medicos/5
+
+### Crear producto
+POST {{url}}/medicos
+Content-Type: application/json
+
+{
+    "nombre": "Martin",
+    "apellido": "Lopez",
+    "especialidad": "Pediatria",
+    "matricula": 1000
+}
+
+### Modificar producto
+PUT {{url}}/medicos/5
+Content-Type: application/json
+
+{
+    "nombre": "Marcelo",
+    "apellido": "Lopez",
+    "especialidad": "Pediatria",
+    "matricula": 34312
+}
+
+### Quitar producto
+DELETE {{url}}/medicos/4
