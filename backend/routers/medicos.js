@@ -1,7 +1,6 @@
 import express from 'express'
 import { db } from '../config/db.js'
 import { verificarValidaciones, validarId, validarMedico } from '../validaciones.js'
-import { body, param } from 'express-validator'
 
 const router = express.Router()
 

@@ -9,6 +9,19 @@ export const validarMedico = [ // Validar body medico
     body("matricula").isInt({min: 1000})
 ]
 
+export const validarUsuario = [ // Validar body usuario
+    body("nombre").isAlpha('es-ES').isLength({ max: 50 }),
+    body("email").isEmail().isLength({ max: 50 }),
+    body("contraseña").isStrongPassword({
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1
+    })
+
+]
+
 export const verificarValidaciones = (req, res, next) => {
     const validacion = validationResult(req)
     if(!validacion.isEmpty()) {

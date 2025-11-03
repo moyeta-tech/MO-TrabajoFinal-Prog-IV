@@ -1,0 +1,31 @@
+@url=http://localhost:3000
+
+### Listado de usuarios
+GET {{url}}/usuarios
+
+
+### Detalles de producto
+GET {{url}}/usuarios/3
+
+### Crear producto
+POST {{url}}/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Martin",
+    "email": "lopez@gmail.com",
+    "contraseña": "Juego_compu04"
+}
+
+### Modificar producto
+PUT {{url}}/usuarios/3
+Content-Type: application/json
+
+{
+    "nombre": "Martin",
+    "email": "lopez@gmail.com",
+    "contraseña": "Juego_compu04"
+}
+
+### Quitar producto
+DELETE {{url}}/usuarios/17
