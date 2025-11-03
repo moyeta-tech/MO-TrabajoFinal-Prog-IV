@@ -9,6 +9,14 @@ export const validarMedico = [ // Validar body medico
     body("matricula").isInt({min: 1000})
 ]
 
+export const validarPaciente = [ // Validar body medico
+    body("nombre").isAlpha('es-ES').isLength({ max: 50 }),
+    body("apellido").isAlpha('es-ES').isLength({ max: 50 }),
+    body("dni").isInt().isLength({ min: 8, max: 8 }),
+    body("fechaNacimiento").isDate(),
+    body('obraSocial').isAlpha('es-ES').isLength({ max: 50 })
+]
+
 export const validarUsuario = [ // Validar body usuario
     body("nombre").isAlpha('es-ES').isLength({ max: 50 }),
     body("email").isEmail().isLength({ max: 50 }),
