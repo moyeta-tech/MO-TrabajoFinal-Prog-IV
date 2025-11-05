@@ -34,7 +34,7 @@ CREATE TABLE `turnos` (
   `paciente_id` int NOT NULL,
   `medico_id` int NOT NULL,
   `fecha` date NOT NULL,
-  `hora` varchar(45) NOT NULL,
+  `hora` time NOT NULL,
   `estado` varchar(50) NOT NULL,
   `observaciones` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
