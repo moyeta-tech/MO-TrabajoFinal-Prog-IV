@@ -15,7 +15,7 @@ Content-Type: application/json
     "nombre": "Pedro",
     "apellido": "Martinez",
     "dni": 45898292,
-    "fechaNacimiento": 10-05-2005,
+    "fechaNacimiento": "2005-05-10",
     "obraSocial": "Apos" 
 }
 
