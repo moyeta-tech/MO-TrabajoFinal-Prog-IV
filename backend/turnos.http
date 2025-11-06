@@ -1,0 +1,37 @@
+@url=http://localhost:3000
+
+### Listado de pacientes con turno
+GET {{url}}/turnos/pacientes/1
+
+
+### Listado de medicos registrados a turnos
+GET {{url}}/turnos/medicos/5
+
+### Crear turno
+POST {{url}}/turnos
+Content-Type: application/json
+
+{
+    "medicoId": 5,
+    "pacienteId": 1,
+    "fecha": "2025-11-10",
+    "hora": "18:30",
+    "estado": "pendiente",
+    "observaciones": "turno en clinica maria" 
+}
+
+### Modificar turno
+PUT {{url}}/turnos/5
+Content-Type: application/json
+
+{
+    "medicoId": 1,
+    "pacienteId": 1,
+    "fecha": "2025-11-10",
+    "hora": "18:30",
+    "estado": "pendiente",
+    "observaciones": "turno en clinica maria" 
+}
+
+### Quitar turno
+DELETE {{url}}/turnos/4

@@ -1,0 +1,34 @@
+@url=http://localhost:3000
+
+### Listado de pacientes
+GET {{url}}/pacientes
+
+
+### Detalles de paciente
+GET {{url}}/pacientes/5
+
+### Crear paciente
+POST {{url}}/pacientes
+Content-Type: application/json
+
+{
+    "nombre": "Pedro",
+    "apellido": "Martinez",
+    "dni": 45898292,
+    "fechaNacimiento": 10-05-2005,
+    "obraSocial": "Apos" 
+}
+
+### Modificar paciente
+PUT {{url}}/pacientes/5
+Content-Type: application/json
+
+{
+    "nombre": "Marcelo",
+    "apellido": "Lopez",
+    "especialidad": "Pediatria",
+    "matricula": 34312
+}
+
+### Quitar paciente
+DELETE {{url}}/pacientes/4

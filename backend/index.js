@@ -3,6 +3,7 @@ import { conectarDB } from './config/db.js'
 import medicosRouter from './routers/medicos.js'
 import usuariosRouter from './routers/usuarios.js'
 import pacientesRouter from './routers/pacientes.js'
+import turnosRouter from './routers/turnos.js'
 
 conectarDB()
 
@@ -19,6 +20,7 @@ app.use(express.json())
 app.use('/medicos', medicosRouter)
 app.use('/usuarios', usuariosRouter)
 app.use('/pacientes', pacientesRouter)
+app.use('/turnos', turnosRouter)
 
 
 
