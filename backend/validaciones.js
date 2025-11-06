@@ -21,15 +21,26 @@ export const validarPaciente = [ // Validar body medico
 ]
 
 export const validarUsuario = [ // Validar body usuario
-    body("nombre").isAlpha('es-ES').isLength({ max: 50 }),
-    body("email").notEmpty().isEmail().isLength({ max: 50 }),
-    body("contraseña").notEmpty().isStrongPassword({
+    body("nombre").isAlphanumeric('es-ES').isLength({ max: 50 }),
+    body("email").notEmpty().withMessage('El email no puede estar vacío').isEmail().isLength({ max: 50 }),
+    body("contraseña").notEmpty().withMessage('La contraseña no puede estar vacía').isStrongPassword({
         minLength: 8,
         minLowercase: 1,
         minUppercase: 1,
         minNumbers: 1,
         minSymbols: 1
     })
+]
+
+export const validarAuth = [
+      body("usuario").isAlphanumeric("es-ES").isLength({ max: 20 }),
+      body("contraseña").isStrongPassword({
+        minLength: 8, // Minimo de 8 caracteres
+        minLowercase: 1, // Al menos una letra en minusculas
+        minUppercase: 0, // Letras mayusculas opcionales
+        minNumbers: 1, // Al menos un número
+        minSymbols: 0, // Símbolos opcionales
+  }),
 ]
 
 export const validarTurno = [ // Validar body turno

@@ -4,6 +4,7 @@ import medicosRouter from './routers/medicos.js'
 import usuariosRouter from './routers/usuarios.js'
 import pacientesRouter from './routers/pacientes.js'
 import turnosRouter from './routers/turnos.js'
+import authRouter from './routers/auth.js'
 
 conectarDB()
 
@@ -21,6 +22,7 @@ app.use('/medicos', medicosRouter)
 app.use('/usuarios', usuariosRouter)
 app.use('/pacientes', pacientesRouter)
 app.use('/turnos', turnosRouter)
+app.use('/auth', authRouter)
 
 
 

@@ -12,9 +12,9 @@ POST {{url}}/usuarios
 Content-Type: application/json
 
 {
-    "nombre": "Martin",
-    "email": "lopez@gmail.com",
-    "contraseña": "Juego_compu04"
+    "nombre": "vendeta10",
+    "email": "mazza@gmail.com",
+    "contraseña": ""
 }
 
 ### Modificar producto

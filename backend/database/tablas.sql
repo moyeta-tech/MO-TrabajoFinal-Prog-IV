@@ -1,7 +1,7 @@
 -- TABLA USUARIOS
 CREATE TABLE `usuarios` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
+  `nombre` varchar(20) NOT NULL,
   `email` varchar(50) NOT NULL,
   `hash_contraseña` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
