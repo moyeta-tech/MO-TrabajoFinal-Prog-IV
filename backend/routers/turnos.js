@@ -93,12 +93,43 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
 
    return res.status(200).json({ success: true, data: { id: rows.insertId, medicoId, pacienteId, fecha, hora, estado, observaciones } })
 
+})
 
    // Por hacer: put y delete
-   router.put('/', async (req, res) => {}) 
+   router.put('/pacientes/:paciente_id/medicos/:medico_id',validarPacienteId, validarMedicoId, validarTurno, verificarValidaciones, async (req, res) => {
+        const paciente_id = Number(req.params.paciente_id)
+        const medico_id = Number(req.params.medico_id)
+        const { fecha, hora, estado } = req.body
 
-   router.delete('/', async (req, res) => {}) 
+        let sqlExisteTurno = "SELECT * FROM turnos WHERE paciente_id=? AND medico_id=? AND fecha=? AND hora=?"
 
-})
+        const [existeTurno] = await db.execute(sqlExisteTurno, [paciente_id, medico_id, fecha, hora])
+
+        if(existeTurno.length === 0){
+            return res.status(404).json({ success: false, message: 'No existe ese turno para el paciente' })
+        }
+        
+        let sqlUpdate = "UPDATE turnos SET fecha=?, hora=?, estado=? WHERE paciente_id=? AND medico_id=?"
+
+        const [rows] = await db.execute(sqlUpdate, [fecha, hora, estado, paciente_id, medico_id])
+
+        return res.status(200).json({ success: true, data: rows })
+
+   }) 
+
+   router.delete('/pacientes/:paciente_id/medicos/:medico_id', async (req, res) => {
+        const paciente_id = Number(req.params.paciente_id)
+        const medico_id = Number(req.params.medico_id)
+
+        let sqlDelete = 'DELETE FROM turnos WHERE paciente_id=? AND medico_id=?'
+        const [result] = await db.execute(sqlDelete, [paciente_id, medico_id])
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'No se encontró el turno para eliminar' })
+        }
+
+        return res.status(200).json({ success: true, message: 'Turno eliminado correctamente' })
+
+   }) 
 
 export default router
