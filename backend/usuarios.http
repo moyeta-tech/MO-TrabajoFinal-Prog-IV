@@ -18,12 +18,12 @@ Content-Type: application/json
 }
 
 ### Modificar producto
-PUT {{url}}/usuarios/3
+PUT {{url}}/usuarios/18
 Content-Type: application/json
 
 {
-    "nombre": "Martin",
-    "email": "lopez@gmail.com",
+    "nombre": "vendeta10",
+    "email": "mazza@gmail.com",
     "contraseña": "Juego_compu04"
 }
 

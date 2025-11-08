@@ -4,7 +4,8 @@ import medicosRouter from './routers/medicos.js'
 import usuariosRouter from './routers/usuarios.js'
 import pacientesRouter from './routers/pacientes.js'
 import turnosRouter from './routers/turnos.js'
-import authRouter from './routers/auth.js'
+import authRouter, { authConfig } from './routers/auth.js'
+import cors from 'cors'
 
 conectarDB()
 
@@ -16,6 +17,10 @@ app.get('/', (req, res) => {
 })
 
 app.use(express.json())
+
+app.use(cors())
+
+authConfig()
 
 // Decimos a la app que utilice los routers
 app.use('/medicos', medicosRouter)

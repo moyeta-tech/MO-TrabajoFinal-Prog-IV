@@ -78,8 +78,8 @@ router.put('/:id', validarId, validarUsuario, verificarValidaciones, async (req,
         return res.status(400).json({ success: false, message: 'Ya existe una cuenta de usuario con ese email' })
     }
 
-    await db.execute("UPDATE usuarios SET nombre=?, email=?, contraseña=? WHERE id=?",
-        [nombre, email, hashContraseña]
+    await db.execute("UPDATE usuarios SET nombre=?, email=?, hash_contraseña=? WHERE id=?",
+        [nombre, email, hashContraseña, id]
     )
 
     return res.status(200).json({ success: true, data: id, nombre, email })
