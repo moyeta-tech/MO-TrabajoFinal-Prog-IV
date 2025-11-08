@@ -7,22 +7,24 @@ export const Layout = () => {
 
     return (
         <main className="container">
-            <nav>
-                <ul>
-                    <li>
-                        <Link to='/'>Home</Link>
-                    </li>
-                    <li>
-                        <Link to='/usuarios'>Usuarios</Link>
-                    </li>
-                    <li>
-                        <Link to='/pacientes'>Pacientes</Link>
-                    </li>
-                    <li>
-                        <Link to='/medicos'>Medicos</Link>
-                    </li>
-                    {isAuthenticated ? ( <button onClick={() => logout()}>Salir</button> ) : ( <Login /> )}
-                </ul>
+            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                <div className="collapse navbar-collapse">
+                    <ul className="navbar-nav">
+                        <li className="navbar-item">
+                            <Link className="nav-link" to='/'>Home</Link>
+                        </li>
+                        <li className="navbar-item">
+                            <Link className="nav-link" to='/usuarios'>Usuarios</Link>
+                        </li>
+                        <li className="navbar-item">
+                            <Link className="nav-link" to='/pacientes'>Pacientes</Link>
+                        </li>
+                        <li className="navbar-item">
+                            <Link className="nav-link" to='/medicos'>Medicos</Link>
+                        </li>
+                        {isAuthenticated ? ( <button className="btn btn-secondary" onClick={() => logout()}>Salir</button> ) : ( <Login /> )}
+                    </ul>
+                </div>
             </nav>
             <Outlet />
         </main>

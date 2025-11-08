@@ -1,1 +1,44 @@
 /* css */
+
+dialog.card {
+  border: none;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  margin: auto;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.header .header-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* separa el ícono del texto */
+  margin-left: 25px;
+  margin-bottom: 30px;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  margin-bottom: 30px;
+  text-align: center;
+  align-items: center;
+  border-bottom: 1px solid #dfdfdf;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px;
+  color: black;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px);  }
+  to { opacity: 1; transform: translateY(); }
+}
+    

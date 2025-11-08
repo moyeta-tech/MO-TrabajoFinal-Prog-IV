@@ -1,4 +1,6 @@
 import { createContext, useContext, useState } from "react";
+import { Login } from "./Login";
+import { Header } from "./Header";
 
 const AuthContext = createContext(null)
 
@@ -64,7 +66,13 @@ export const AuthPage = ({ children }) => {
     const { isAuthenticated } = useAuth()
 
     if(!isAuthenticated) {
-        return <h2>Ingrese para ver esta pagina</h2>
+        return ( 
+            <div style={{ textAlign: 'center' }}>
+                <Header />
+                <h2>Inicie sesión</h2>
+                <Login />
+            </div>
+        )
     }
 
     return children
