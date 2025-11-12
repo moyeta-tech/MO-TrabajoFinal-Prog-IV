@@ -67,7 +67,7 @@ export const AuthPage = ({ children }) => {
 
     if(!isAuthenticated) {
         return ( 
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
                 <Header />
                 <h2>Inicie sesión</h2>
                 <Login />

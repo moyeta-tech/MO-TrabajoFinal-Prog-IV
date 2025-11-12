@@ -22,6 +22,9 @@ export const Layout = () => {
                         <li className="navbar-item">
                             <Link className="nav-link" to='/medicos'>Medicos</Link>
                         </li>
+                        <li className="navbar-item">
+                            <Link className="nav-link" to='/turnos'>Turnos</Link>
+                        </li>
                         {isAuthenticated ? ( <button className="btn btn-secondary" onClick={() => logout()}>Salir</button> ) : ( <Login /> )}
                     </ul>
                 </div>

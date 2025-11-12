@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         return res.status(400).json({ success: false, message: 'No tiene datos de medicos' })
     }
 
-    return res.status(200).json({ success: true, data: rows })
+    return res.status(200).json({ success: true, medicos: rows })
 })
 
 router.get('/:id', validarId, verificarValidaciones, async (req, res) => {

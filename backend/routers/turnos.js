@@ -4,8 +4,28 @@ import { validarMedicoId, validarPacienteId, validarTurno, verificarValidaciones
 
 const router = express.Router()
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+    let sql = `SELECT t.id,
+               t.fecha AS fecha,
+               t.hora AS hora,
+               t.estado AS estado,
+               p.id AS paciente_id,
+                    CONCAT(p.nombre, ' ', p.apellido) AS nombre_paciente,
+                m.id AS medico_id,
+                    CONCAT(m.nombre, ' ', m.apellido) AS nombre_medico,
+               observaciones 
+               FROM turnos t
+               JOIN medicos m on m.id = t.medico_id
+               JOIN pacientes p on p.id = t.paciente_id
+               ORDER BY fecha, hora
+               `
+    const [rows] = await db.execute(sql)
 
+    if(rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'No hay turnos asignados'})
+    }
+
+    return res.status(200).json({ success: true, turnos: rows })
 })
 
 router.get('/pacientes/:paciente_id', validarPacienteId, verificarValidaciones, async (req, res) => {
@@ -18,7 +38,8 @@ router.get('/pacientes/:paciente_id', validarPacienteId, verificarValidaciones, 
                 m.id AS medico_id,
                 m.nombre AS nombre_medico,
                 m.apellido AS apellido_medico
-                FROM turnos t JOIN medicos m ON m.id = t.medico_id
+                FROM turnos t 
+                JOIN medicos m ON m.id = t.medico_id
                 WHERE t.paciente_id = ? `
     
     const [rows] = await db.execute(sql, [pacienteId])
@@ -43,7 +64,8 @@ router.get('/medicos/:medico_id', validarMedicoId, verificarValidaciones, async 
                     p.dni AS dni_paciente,
                     p.fecha_nacimiento AS fecha_nacimiento_paciente,
                     p.obra_social AS obra_social_paciente
-               FROM turnos t JOIN pacientes p ON t.paciente_id = p.id
+               FROM turnos t 
+               JOIN pacientes p ON t.paciente_id = p.id
                WHERE t.medico_id = ?
     `
     const [rows] = await db.execute(sql, [medicoId])
