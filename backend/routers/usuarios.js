@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
         return res.status(400).json({ success: false, message: 'No tiene datos de usuarios' })
     }
 
-    return res.status(200).json({ success: true, data: rows.map((u) => ({...u, hash_contraseña: undefined})) })
+    return res.status(200).json({ success: true, usuarios: rows.map((u) => ({...u, hash_contraseña: undefined})) })
 
 
 })
