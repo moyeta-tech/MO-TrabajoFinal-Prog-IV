@@ -71,9 +71,6 @@ export const Usuarios = () => {
                       <td>{u.email}</td>
                       <td>
                         <div className="d-flex gap-3 justify-content-center">
-                          <Link className="btn btn-info" to={`/usuarios/${u.id}`}>
-                            Ver
-                          </Link>
                             <Link className="btn btn-primary" to={`/usuarios/${u.id}/modificar`}>
                               Modificar
                             </Link>

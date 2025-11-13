@@ -77,6 +77,37 @@ router.get('/medicos/:medico_id', validarMedicoId, verificarValidaciones, async 
     return res.status(200).json({ success: true, data: rows })
 })
 
+router.get('/medicos/:medico_id/pacientes/:paciente_id', validarMedicoId, validarPacienteId, verificarValidaciones, async (req, res) => {
+    const medicoId = Number(req.params.medico_id);
+    const pacienteId = Number(req.params.paciente_id);
+
+    let sql = `
+        SELECT t.id,
+               t.fecha AS fecha,
+               t.hora AS hora,
+               t.estado AS estado,
+               p.id AS paciente_id,
+               CONCAT(p.nombre, ' ', p.apellido) AS nombre_paciente,
+               m.id AS medico_id,
+               CONCAT(m.nombre, ' ', m.apellido) AS nombre_medico,
+               t.observaciones 
+        FROM turnos t
+        JOIN medicos m ON m.id = t.medico_id
+        JOIN pacientes p ON p.id = t.paciente_id
+        WHERE t.medico_id = ? AND t.paciente_id = ?
+        ORDER BY fecha, hora
+    `;
+
+    const [rows] = await db.execute(sql, [medicoId, pacienteId]);
+
+    if (rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'No se encontró turno con ese médico y paciente' });
+    }
+
+    return res.status(200).json({ success: true, turno: rows[0] });
+});
+
+
 router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, res) => {
     console.log('Datos recibidos:', req.body)
 
@@ -142,6 +173,14 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
             return res.status(404).json({ success: false, message: 'No existe ese turno para el paciente' })
         }
         
+           let sqlMedicoOcupado = 'SELECT * FROM turnos WHERE medico_id=? AND fecha=? AND hora=?'
+
+            const [ocupado] = await db.execute(sqlMedicoOcupado, [medico_id, fecha, hora])
+
+            if(ocupado.length > 0) {
+                    return res.status(400).json({ success: false, message: 'Horario ocupado' })
+            }
+
         let sqlUpdate = "UPDATE turnos SET fecha=?, hora=?, estado=? WHERE paciente_id=? AND medico_id=?"
 
         const [rows] = await db.execute(sqlUpdate, [fecha, hora, estado, paciente_id, medico_id])

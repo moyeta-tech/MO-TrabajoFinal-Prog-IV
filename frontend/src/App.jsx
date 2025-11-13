@@ -10,7 +10,7 @@ function App() {
       
       <div className="card shadow-sm border-0 rounded-4 p-4 text-center">
         <h2 className="fw-bold mb-3 text-primary">Bienvenido de nuevo </h2>
-        <p className="lead text-muted">
+        <p className="lead text-muted fs-3">
           Desde este panel podés gestionar tus pacientes, médicos y turnos.
         </p>
 

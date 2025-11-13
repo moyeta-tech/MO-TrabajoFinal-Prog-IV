@@ -78,9 +78,6 @@ export const Pacientes = () => {
                             <td>{u.obra_social}</td>
                             <td>
                                 <div className="d-flex gap-3 justify-content-center">
-                                <Link className="btn btn-info" to={`/pacientes/${u.id}`}>
-                                    Ver
-                                </Link>
                                     <Link className="btn btn-primary" to={`/pacientes/${u.id}/modificar`}>
                                     Modificar
                                     </Link>

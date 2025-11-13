@@ -52,7 +52,7 @@ export const validarTurno = [ // Validar body turno
     return true;
   }),
     body("estado").notEmpty().isAlpha('es-ES').isLength({ min: 50 }).withMessage('El estado no puede tener mas de 50 caracteres'),
-    body("observaciones").isAlpha('es-ES').isLength({ min: 50 }).withMessage('Las observaciones no puede tener mas de 50 caracteres')
+    body("observaciones").optional().isAlpha('es-ES').isLength({ min: 50 }).withMessage('Las observaciones no puede tener mas de 50 caracteres')
 ]
 
 export const verificarValidaciones = (req, res, next) => {

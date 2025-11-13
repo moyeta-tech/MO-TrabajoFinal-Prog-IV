@@ -75,9 +75,6 @@ export const Medicos = () => {
                             <td>{u.matricula_profesional}</td>
                             <td>
                                 <div className="d-flex gap-3 justify-content-center">
-                                <Link className="btn btn-info" to={`/medicos/${u.id}`}>
-                                    Ver
-                                </Link>
                                     <Link className="btn btn-primary" to={`/medicos/${u.id}/modificar`}>
                                     Modificar
                                     </Link>

@@ -13,6 +13,9 @@ import { Turnos } from './Turnos.jsx'
 import { CrearPaciente } from './CrearPaciente.jsx'
 import { CrearMedico } from './CrearMedico.jsx'
 import { CrearUsuario } from './CrearUsuario.jsx'
+import { ModificarPaciente } from './ModificarPaciente.jsx'
+import { ModificarMedico } from './ModificarMedico.jsx'
+import { ModificarTurno } from './ModificarTurno.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -27,6 +30,10 @@ createRoot(document.getElementById('root')).render(
             <Route path='turnos' element={<AuthPage> <Turnos /> </AuthPage>} />
             <Route path='pacientes/crear' element={<AuthPage> <CrearPaciente /> </AuthPage>} />
             <Route path='medicos/crear' element={<AuthPage> <CrearMedico /> </AuthPage>} />
+            <Route path='pacientes/:id/modificar' element={<AuthPage> <ModificarPaciente /> </AuthPage>} />
+            <Route path='medicos/:id/modificar' element={<AuthPage> <ModificarMedico /> </AuthPage>} />
+            <Route path='turnos/pacientes/:paciente_id/medicos/:medico_id/modificar' element={<AuthPage> <ModificarTurno /> </AuthPage>} />
+
           </Route>
             <Route path='usuarios/crear' element={<> <Header /> <CrearUsuario /> </> } />
         </Routes>

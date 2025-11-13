@@ -26,7 +26,7 @@ router.get('/:id', validarId, verificarValidaciones, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Medico no encontrado' })
     }
 
-    return res.status(200).json({ success: true, data: rows[0] })
+    return res.status(200).json({ success: true, medico: rows[0] })
 })
 
 router.post('/', validarMedico, verificarValidaciones, async (req, res) => {

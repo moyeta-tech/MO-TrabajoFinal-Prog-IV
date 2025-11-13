@@ -26,7 +26,16 @@ router.get('/:id', validarId, verificarValidaciones, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Paciente no encontrado' })
     }
 
-    return res.status(200).json({ success: true, data: rows[0] })
+    const paciente = {
+        id: rows[0].id,
+        nombre: rows[0].nombre,
+        apellido: rows[0].apellido,
+        dni: rows[0].dni,
+        fechaNacimiento: rows[0].fecha_nacimiento,
+        obraSocial: rows[0].obra_social
+    };
+
+    return res.status(200).json({ success: true, paciente })
 })
 
 router.post('/', validarPaciente, verificarValidaciones, async (req, res) => {
@@ -55,7 +64,7 @@ router.put('/:id', validarId, validarPaciente, verificarValidaciones, async (req
         [nombre, apellido, dni, fechaNacimiento, obraSocial, id]
     )
 
-    return res.json({ success: true, data: { id, nombre, apellido, dni, fechaNacimiento, obraSocial }})
+    return res.json({ success: true, paciente: { id, nombre, apellido, dni, fechaNacimiento, obraSocial }})
 
 })
 

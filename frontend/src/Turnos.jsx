@@ -30,6 +30,7 @@ export function Turnos() {
         return
       }
 
+      console.log(data.turnos)
       setTurnos(data.turnos)
   }
 
@@ -199,10 +200,7 @@ export function Turnos() {
                         <td>{t.estado ?? ''}</td>
                         <td>
                           <div className="d-flex gap-3 justify-content-center">
-                            <Link className="btn btn-info" to={`/usuarios/${t.id}`}>
-                              Ver
-                            </Link>
-                              <Link className="btn btn-primary" to={`/usuarios/${t.id}/modificar`}>
+                              <Link className="btn btn-primary" to={`/turnos/pacientes/${t.paciente_id}/medicos/${t.medico_id}/modificar`}>
                                 Modificar
                               </Link>
                               <button className="btn btn-danger" onClick={() => handleEliminar(t.id)}>Quitar</button>
