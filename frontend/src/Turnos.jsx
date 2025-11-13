@@ -2,14 +2,23 @@ import { useEffect, useState } from 'react'
 import { useAuth } from './Auth'
 import { Link } from 'react-router'
 
-export function Turnos({ onCreated }) {
+export function Turnos() {
   const { fetchAuth } = useAuth()
 
   const [turnos, setTurnos] = useState([])
   const [pacientes, setPacientes] = useState([])
-  const [profesionales, setProfesionales] = useState([])
+  const [medicos, setMedicos] = useState([])
   const [loading, setLoading] = useState('')
   const [error, setError] = useState('')
+
+  const [nuevoTurno, setNuevoTurno] = useState({
+      pacienteId: "",
+      medicoId: "",
+      fecha: "",
+      hora: "",
+      estado: "",
+      observaciones: ""
+  });
 
   const fetchTurnos = async () => {
     
@@ -24,52 +33,86 @@ export function Turnos({ onCreated }) {
       setTurnos(data.turnos)
   }
 
+  const fetchPacientes = async () => {
+    const response = await fetchAuth('http://localhost:3000/pacientes')
+    const data = await response.json()
+
+    if(!response.ok) {
+      console.log("error: ", data.error)
+      return
+    }
+
+    setPacientes(data.pacientes)
+  }
+
+    const fetchMedicos = async () => {
+    const response = await fetchAuth('http://localhost:3000/medicos')
+    const data = await response.json()
+
+    if(!response.ok) {
+      console.log("error: ", data.error)
+      return
+    }
+
+    setMedicos(data.medicos)
+  }
+
     useEffect(() => {
 
       fetchTurnos()
+      fetchPacientes()
+      fetchMedicos()
   }, [fetchAuth])
 
-  const onSubmit = async (data) => {
-    const turno = {
-      paciente_id: parseInt(data.paciente_id),
-      profesional_id: parseInt(data.profesional_id),
-      fecha: data.fecha,
-      hora: data.hora,
-    }
-
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      await api.post('/turnos', turno);
-      reset();
-      onCreated?.();
+      const response = await fetchAuth('http://localhost:3000/turnos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoTurno)
+      })
+
+      const data = await response.json()
+      if(!response.ok) {
+        throw new Error(data.message || 'Error al asignar turno')
+      }
+
+      alert('Turno asignado con éxito')
+      setNuevoTurno({ pacienteId: "", medicoId: "", fecha: "", hora: "", estado: "", observaciones: "" })
+      await fetchTurnos()
     } catch (e) {
-      alert(e?.response?.data?.detail || 'Error creando turno');
+      alert(e.message || 'Error creando turno');
     }
   }
 
-  const onDelete = async (id) => {
-    if(!confirm('¿Deseas eliminar este turno?')) return
-    setLoading(true)
-    try {
-      await api.delete(`/turnos/${id}`)
-      await cargar()
+      const handleEliminar = async (id) => {
+        if(window.confirm('¿Desea eliminar el turno?')) {
+          const response = await fetchAuth(`http://localhost:3000/turnos/${id}`, 
+            { method: 'DELETE' }
+          )
 
-    } catch(e) {
-      console.error('Error eliminando el turno: ', e.response?.data || e.message)
-      setError('No se pudo eliminar el turno')
-    } finally {
-      setLoading(false)
-    }
-  }
+          const data = await response.json()
+
+          if(!response.ok || !data.success) {
+            throw new Error('Error al quitar el turno')
+          }
+
+          await fetchTurnos()
+        }
+      }
 
   return (
     <>
 
-        {/* <div className='container py-5'>
+        <div className='container py-5'>
         <h1>Nuevo Turno</h1>
-          <form className="row g-3" onSubmit={handleSubmit(onSubmit)}>
+          <form className="row g-3" onSubmit={handleSubmit}>
             <div className="col-md-6">
               <label className="form-label">Paciente</label>
-              <select className="form-select" {...register('paciente_id', { required: true })}>
+              <select className="form-select" 
+              value={nuevoTurno.pacienteId} 
+              onChange={(e) => setNuevoTurno({...nuevoTurno, pacienteId: e.target.value})} >
                 <option value="">Seleccione…</option>
                 {pacientes.map(p => <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>)}
               </select>
@@ -77,27 +120,52 @@ export function Turnos({ onCreated }) {
 
             <div className="col-md-6">
               <label className="form-label">Profesional</label>
-              <select className="form-select" {...register('profesional_id', { required: true })}>
+              <select className="form-select" 
+              value={nuevoTurno.medicoId} 
+              onChange={(e) => setNuevoTurno({ ...nuevoTurno, medicoId: e.target.value })}>
                 <option value="">Seleccione…</option>
-                {profesionales.map(p => <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>)}
+                {medicos.map(m => <option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
               </select>
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Fecha</label>
-              <input type="date" className="form-control" {...register('fecha', { required: true })}/>
+              <input type="date" className="form-control" 
+              value={nuevoTurno.fecha} 
+              onChange={(e) => setNuevoTurno({ ...nuevoTurno, fecha: e.target.value })}/>
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Hora</label>
-              <input type="time" className="form-control" {...register('hora', { required: true })}/>
+              <input type="time" className="form-control" 
+              value={nuevoTurno.hora} 
+              onChange={(e) => setNuevoTurno({ ...nuevoTurno, hora: e.target.value })}/>
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Estado</label>
+              <select className="form-select" 
+              value={nuevoTurno.estado} 
+              onChange={(e) => setNuevoTurno({ ...nuevoTurno, estado: e.target.value })}>
+                <option value="">Seleccione…</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label">Observaciones</label>
+              <input type="text" className="form-control" 
+              value={nuevoTurno.observaciones} 
+              onChange={(e) => setNuevoTurno({ ...nuevoTurno, observaciones: e.target.value })}/>
             </div>
 
             <div className="col-12">
               <button className="btn btn-primary" type="submit">Guardar</button>
             </div>
           </form>
-        </div> */}
+        </div>
 
       <h2>Turnos</h2>
       <div className="card">

@@ -57,9 +57,15 @@ export const AuthProvider = ({ children }) => {
 
     }
 
+    const fetchRegistrarse = async (url, options = {}) => {
+        return fetch(url, {
+            ...options,
+            headers: { ...options.headers, Authorization: `Bearer ${token}` }
+        })
 
+    }
 
-    return <AuthContext.Provider value={{ token, usuario, error, isAuthenticated: !!token, login, logout, fetchAuth}}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ token, usuario, error, isAuthenticated: !!token, login, logout, fetchAuth, fetchRegistrarse}}>{children}</AuthContext.Provider>
 }
 
 export const AuthPage = ({ children }) => {

@@ -21,7 +21,7 @@ export const Login = () => {
 
     return (
         <>
-            <Link className="btn btn-success" to={'/usuarios/crear'} >Crear usuario</Link>
+            <Link className="btn btn-success" to={'/usuarios/crear'} >Registrarse</Link>
             <button className="btn btn-primary" onClick={() => setOpen(true)}>Ingresar</button>
             <dialog open={open} className={open ? 'card' : ''}>
                 <article>

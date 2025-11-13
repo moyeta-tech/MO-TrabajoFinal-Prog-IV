@@ -78,6 +78,8 @@ router.get('/medicos/:medico_id', validarMedicoId, verificarValidaciones, async 
 })
 
 router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, res) => {
+    console.log('Datos recibidos:', req.body)
+
     const { medicoId, pacienteId, fecha, hora, estado, observaciones } = req.body
 
 
@@ -107,6 +109,15 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
 
    if(existeTurno.length > 0) {
      return res.status(400).json({ success: false, message: 'Ya se encuentra un turno registrado con esos datos' })
+   }
+
+   // Verificamos que no exista un turno con ese profesional en ese mismo horario
+   let sqlMedicoOcupado = 'SELECT * FROM turnos WHERE medico_id=? AND fecha=? AND hora=?'
+
+   const [ocupado] = await db.execute(sqlMedicoOcupado, [medicoId, fecha, hora])
+
+   if(ocupado.length > 0) {
+        return res.status(400).json({ success: false, message: 'Horario ocupado' })
    }
 
    let sqlInsert = 'INSERT INTO turnos (medico_id, paciente_id, fecha, hora, estado, observaciones) VALUES (?,?,?,?,?,?)'
@@ -146,7 +157,7 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
         let sqlDelete = 'DELETE FROM turnos WHERE paciente_id=? AND medico_id=?'
         const [result] = await db.execute(sqlDelete, [paciente_id, medico_id])
 
-        if (result.affectedRows === 0) {
+        if (result.length === 0) {
             return res.status(404).json({ success: false, message: 'No se encontró el turno para eliminar' })
         }
 
@@ -154,4 +165,19 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
 
    }) 
 
+   router.delete('/:id', async (req, res) => {
+        const id = req.params.id
+
+        let sqlDelete = 'DELETE FROM turnos WHERE id=?'
+
+        const [result] = await db.execute(sqlDelete, [id])
+
+        if (result.length === 0) {
+            return res.status(404).json({ success: false, message: 'No se encontró el turno para eliminar' })
+        }
+
+        return res.status(200).json({ success: true, message: 'Turno eliminado correctamente' })
+
+
+   })
 export default router

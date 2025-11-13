@@ -28,7 +28,7 @@ export const Pacientes = () => {
 
 
       const handleEliminar = async (id) => {
-        if(window.confirm('¿Desea eliminar al usuario?')) {
+        if(window.confirm('¿Desea eliminar al paciente?')) {
           const response = await fetchAuth(`http://localhost:3000/pacientes/${id}`, 
             { method: 'DELETE' }
           )
