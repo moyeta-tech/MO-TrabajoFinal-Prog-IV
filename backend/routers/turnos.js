@@ -1,10 +1,11 @@
-import express, { Router } from 'express'
+import express from 'express'
 import { db } from '../config/db.js'
 import { validarMedicoId, validarPacienteId, validarTurno, verificarValidaciones } from '../validaciones.js'
+import { verificarAutenticacion } from './auth.js'
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get('/', verificarAutenticacion, async (req, res) => {
     let sql = `SELECT t.id,
                t.fecha AS fecha,
                t.hora AS hora,
@@ -28,7 +29,7 @@ router.get('/', async (req, res) => {
     return res.status(200).json({ success: true, turnos: rows })
 })
 
-router.get('/pacientes/:paciente_id', validarPacienteId, verificarValidaciones, async (req, res) => {
+router.get('/pacientes/:paciente_id', verificarAutenticacion, validarPacienteId, verificarValidaciones, async (req, res) => {
     const pacienteId = Number(req.params.paciente_id)
     let sql = `SELECT t.id AS turno_id,
                 t.fecha,
@@ -51,7 +52,7 @@ router.get('/pacientes/:paciente_id', validarPacienteId, verificarValidaciones, 
     return res.status(200).json({ success: true, data: rows })
 })
 
-router.get('/medicos/:medico_id', validarMedicoId, verificarValidaciones, async (req, res) => {
+router.get('/medicos/:medico_id', verificarAutenticacion, validarMedicoId, verificarValidaciones, async (req, res) => {
     const medicoId = Number(req.params.medico_id)
     let sql = `SELECT t.id AS turno_id,
                     t.fecha,
@@ -77,7 +78,7 @@ router.get('/medicos/:medico_id', validarMedicoId, verificarValidaciones, async 
     return res.status(200).json({ success: true, data: rows })
 })
 
-router.get('/medicos/:medico_id/pacientes/:paciente_id', validarMedicoId, validarPacienteId, verificarValidaciones, async (req, res) => {
+router.get('/medicos/:medico_id/pacientes/:paciente_id', verificarAutenticacion, validarMedicoId, validarPacienteId, verificarValidaciones, async (req, res) => {
     const medicoId = Number(req.params.medico_id);
     const pacienteId = Number(req.params.paciente_id);
 
@@ -108,7 +109,69 @@ router.get('/medicos/:medico_id/pacientes/:paciente_id', validarMedicoId, valida
 });
 
 
-router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, res) => {
+// GET /turnos/:id
+router.get('/:id', verificarAutenticacion, async (req, res) => {
+  const id = Number(req.params.id);
+
+  const sql = `
+    SELECT t.id,
+           t.fecha,
+           t.hora,
+           t.estado,
+           t.observaciones,
+           p.id AS paciente_id,
+           CONCAT(p.nombre, ' ', p.apellido) AS nombre_paciente,
+           m.id AS medico_id,
+           CONCAT(m.nombre, ' ', m.apellido) AS nombre_medico
+    FROM turnos t
+    JOIN pacientes p ON p.id = t.paciente_id
+    JOIN medicos   m ON m.id = t.medico_id
+    WHERE t.id = ?
+  `;
+
+  const [rows] = await db.execute(sql, [id]);
+
+  if (rows.length === 0) {
+    return res.status(404).json({ success: false, message: 'No existe ese turno' });
+  }
+
+  return res.json({ success: true, turno: rows[0] });
+});
+
+// PUT /turnos/:id
+router.put('/:id', verificarAutenticacion, validarTurno, verificarValidaciones, async (req, res) => {
+  const id = Number(req.params.id);
+  const { fecha, hora, estado } = req.body;
+
+  // 1) Verificar que exista el turno
+  const [rows] = await db.execute('SELECT * FROM turnos WHERE id=?', [id]);
+  if (rows.length === 0) {
+    return res.status(404).json({ success: false, message: 'No existe ese turno' });
+  }
+  const turno = rows[0];
+
+  // 2) Chequear horario ocupado para ese médico, excluyendo ESTE id
+  const sqlMedicoOcupado = `
+    SELECT * FROM turnos
+    WHERE medico_id=? AND fecha=? AND hora=? AND id<>?
+  `;
+  const [ocupado] = await db.execute(sqlMedicoOcupado, [turno.medico_id, fecha, hora, id]);
+  if (ocupado.length > 0) {
+    return res.status(400).json({ success: false, message: 'Horario ocupado' });
+  }
+
+  // 3) Actualizar solo ese turno
+  const sqlUpdate = `
+    UPDATE turnos SET fecha=?, hora=?, estado=?
+    WHERE id=?
+  `;
+  await db.execute(sqlUpdate, [fecha, hora, estado, id]);
+
+  return res.json({ success: true });
+});
+
+
+router.post('/', verificarAutenticacion, validarMedicoId, validarPacienteId, validarTurno,  async (req, res) => {
     console.log('Datos recibidos:', req.body)
 
     const { medicoId, pacienteId, fecha, hora, estado, observaciones } = req.body
@@ -159,27 +222,33 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
 
 })
 
-   // Por hacer: put y delete
-   router.put('/pacientes/:paciente_id/medicos/:medico_id',validarPacienteId, validarMedicoId, validarTurno, verificarValidaciones, async (req, res) => {
+   router.put('/pacientes/:paciente_id/medicos/:medico_id', verificarAutenticacion, validarPacienteId, validarMedicoId, validarTurno, verificarValidaciones, async (req, res) => {
         const paciente_id = Number(req.params.paciente_id)
         const medico_id = Number(req.params.medico_id)
         const { fecha, hora, estado } = req.body
 
-        let sqlExisteTurno = "SELECT * FROM turnos WHERE paciente_id=? AND medico_id=? AND fecha=? AND hora=?"
+        const sqlBuscar = `
+            SELECT * FROM turnos
+            WHERE paciente_id=? AND medico_id=?
+            LIMIT 1
+        `;
+        const [turnos] = await db.execute(sqlBuscar, [paciente_id, medico_id]);
 
-        const [existeTurno] = await db.execute(sqlExisteTurno, [paciente_id, medico_id, fecha, hora])
-
-        if(existeTurno.length === 0){
-            return res.status(404).json({ success: false, message: 'No existe ese turno para el paciente' })
+        if (turnos.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No existe ese turno para el paciente"
+            });
         }
+
         
-           let sqlMedicoOcupado = 'SELECT * FROM turnos WHERE medico_id=? AND fecha=? AND hora=?'
+        //    let sqlMedicoOcupado = 'SELECT * FROM turnos WHERE medico_id=? AND fecha=? AND hora=? AND id<>?'
 
-            const [ocupado] = await db.execute(sqlMedicoOcupado, [medico_id, fecha, hora])
+        //     const [ocupado] = await db.execute(sqlMedicoOcupado, [medico_id, fecha, hora, turnos[0].id])
 
-            if(ocupado.length > 0) {
-                    return res.status(400).json({ success: false, message: 'Horario ocupado' })
-            }
+        //     if(ocupado.length > 0) {
+        //             return res.status(400).json({ success: false, message: 'Horario ocupado' })
+        //     }
 
         let sqlUpdate = "UPDATE turnos SET fecha=?, hora=?, estado=? WHERE paciente_id=? AND medico_id=?"
 
@@ -189,7 +258,7 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
 
    }) 
 
-   router.delete('/pacientes/:paciente_id/medicos/:medico_id', async (req, res) => {
+   router.delete('/pacientes/:paciente_id/medicos/:medico_id', verificarAutenticacion, async (req, res) => {
         const paciente_id = Number(req.params.paciente_id)
         const medico_id = Number(req.params.medico_id)
 
@@ -204,7 +273,7 @@ router.post('/', validarMedicoId, validarPacienteId, validarTurno,  async (req, 
 
    }) 
 
-   router.delete('/:id', async (req, res) => {
+   router.delete('/:id', verificarAutenticacion, async (req, res) => {
         const id = req.params.id
 
         let sqlDelete = 'DELETE FROM turnos WHERE id=?'

@@ -1,12 +1,13 @@
 import express from 'express'
 import { db } from '../config/db.js'
 import bcrypt from 'bcrypt'
-import { verificarValidaciones, validarId, validarUsuario } from '../validaciones.js'
+import { verificarValidaciones, validarId, validarUsuario, validarUsuarioSinContraseña } from '../validaciones.js'
+import { verificarAutenticacion } from './auth.js'
 
 const router = express.Router()
 
 
-router.get('/', async (req, res) => {
+router.get('/', verificarAutenticacion, async (req, res) => {
     
     const [rows] = await db.execute("SELECT * FROM usuarios")
     
@@ -19,10 +20,10 @@ router.get('/', async (req, res) => {
 
 })
 
-router.get('/:id', validarId, verificarValidaciones, async (req, res) => {
+router.get('/:id', verificarAutenticacion, validarId, verificarValidaciones, async (req, res) => {
      const id = Number(req.params.id)
 
-    let query = "SELECT * FROM usuarios WHERE id = ?"
+    let query = "SELECT nombre, email FROM usuarios WHERE id = ?"
 
     const [rows] = await db.execute(query, [id])
 
@@ -30,11 +31,11 @@ router.get('/:id', validarId, verificarValidaciones, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Usuario no encontrado' })
     }
 
-    return res.status(200).json({ success: true, data: rows.map((u) => ({...u, hash_contraseña: undefined})) })
+    return res.status(200).json({ success: true, usuario: rows[0] })
 
 })
 
-router.post('/', validarUsuario, verificarValidaciones, async (req, res) => {
+router.post('/', verificarAutenticacion, validarUsuario, verificarValidaciones, async (req, res) => {
     const { nombre, email, contraseña } = req.body
 
     const hashContraseña = await bcrypt.hash(contraseña, 12)
@@ -56,12 +57,10 @@ router.post('/', validarUsuario, verificarValidaciones, async (req, res) => {
 
 })
 
-router.put('/:id', validarId, validarUsuario, verificarValidaciones, async (req, res) => {
+router.put('/:id', verificarAutenticacion, validarId, validarUsuarioSinContraseña, verificarValidaciones, async (req, res) => {
     const id = Number(req.params.id)
-    const { nombre, email, contraseña } = req.body
+    const { nombre, email } = req.body
     
-    const hashContraseña = await bcrypt.hash(contraseña, 12)
-
     let emailExistente = "SELECT * FROM usuarios WHERE id<>? AND email=?"
 
     let query = "SELECT * FROM usuarios WHERE id=?"
@@ -78,8 +77,8 @@ router.put('/:id', validarId, validarUsuario, verificarValidaciones, async (req,
         return res.status(400).json({ success: false, message: 'Ya existe una cuenta de usuario con ese email' })
     }
 
-    await db.execute("UPDATE usuarios SET nombre=?, email=?, hash_contraseña=? WHERE id=?",
-        [nombre, email, hashContraseña, id]
+    await db.execute("UPDATE usuarios SET nombre=?, email=? WHERE id=?",
+        [nombre, email, id]
     )
 
     return res.status(200).json({ success: true, data: id, nombre, email })
@@ -87,7 +86,7 @@ router.put('/:id', validarId, validarUsuario, verificarValidaciones, async (req,
 
 })
 
-router.delete('/:id', validarId, verificarValidaciones, async (req, res) => {
+router.delete('/:id', verificarAutenticacion, validarId, verificarValidaciones, async (req, res) => {
 const id = Number(req.params.id)
 
     let query = 'SELECT * FROM usuarios WHERE id=?'

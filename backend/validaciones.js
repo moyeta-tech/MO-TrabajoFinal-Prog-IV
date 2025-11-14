@@ -32,6 +32,11 @@ export const validarUsuario = [ // Validar body usuario
     }).withMessage('Debe contener al menos 8 caracteres, 1 minuscula, 1 mayuscula, 1 numero y 1 simbolo')
 ]
 
+export const validarUsuarioSinContraseña = [
+     body("nombre").isAlphanumeric('es-ES').isLength({ max: 50 }).withMessage('El nombre no puede tener mas de 50 caracteres'),
+     body("email").notEmpty().withMessage('El email no puede estar vacío').isEmail().isLength({ max: 50 }).withMessage('El nombre no puede tener mas de 50 caracteres')
+]
+
 export const validarAuth = [
       body("usuario").isAlphanumeric("es-ES").isLength({ max: 20 }).withMessage('El nombre no puede tener mas de 20 caracteres'),
       body("contraseña").isStrongPassword({
@@ -51,8 +56,8 @@ export const validarTurno = [ // Validar body turno
     }
     return true;
   }),
-    body("estado").notEmpty().isAlpha('es-ES').isLength({ min: 50 }).withMessage('El estado no puede tener mas de 50 caracteres'),
-    body("observaciones").optional().isAlpha('es-ES').isLength({ min: 50 }).withMessage('Las observaciones no puede tener mas de 50 caracteres')
+    body("estado").notEmpty().isAlpha('es-ES').isLength({ max: 50 }).withMessage('El estado no puede tener mas de 50 caracteres'),
+    body("observaciones").optional().isAlpha('es-ES').isLength({ max: 50 }).withMessage('Las observaciones no puede tener mas de 50 caracteres')
 ]
 
 export const verificarValidaciones = (req, res, next) => {

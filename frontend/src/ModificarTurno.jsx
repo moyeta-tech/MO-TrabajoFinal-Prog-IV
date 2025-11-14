@@ -3,28 +3,28 @@ import { useEffect, useState } from "react";
 import { useAuth } from "./Auth"; // si usás fetchAuth
 
 export const ModificarTurno = () => {
-  const { paciente_id, medico_id } = useParams();
+  const { id } = useParams();
   const { fetchAuth } = useAuth();
   const navigate = useNavigate()
 
   const [turno, setTurno] = useState(null);
+  const [errores, setErrores] = useState(null)
 
     const fetchTurno = async () => {
-        const resp = await fetchAuth(`http://localhost:3000/turnos/medicos/${medico_id}/pacientes/${paciente_id}`);
+        const resp = await fetchAuth(`http://localhost:3000/turnos/${id}`);
         const data = await resp.json();
         if (!resp.ok) {
-            console.log('Error obteniendo el turno: ', data.error)
+            console.log('Error obteniendo el turno: ', data.message)
             return
         }
 
-        console.log("Respuesta del backend:", data.turno);
 
         setTurno(data.turno)
     };
 
   useEffect(() => {
     fetchTurno();
-  }, [fetchAuth]);
+  }, [fetchAuth, id]);
 
 
 const handleSubmit = async (e) => {
@@ -36,14 +36,16 @@ const handleSubmit = async (e) => {
     estado: turno.estado.trim()
   };
 
-    const resp = await fetchAuth(`http://localhost:3000/turnos/pacientes/${paciente_id}/medicos/${medico_id}`, {
+    const resp = await fetchAuth(`http://localhost:3000/turnos/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(turno),
+      body: JSON.stringify(body),
     });
     const data = await resp.json();
     if (!resp.ok || !data.success) {
-        return alert('Error al modificar el turno: ', data.error)
+        setErrores(data.message)
+        return
+
     }
   
     navigate('/turnos')
@@ -92,22 +94,19 @@ const handleSubmit = async (e) => {
             setTurno({ ...turno, hora: e.target.value })
           }
         />
-        <input
-          type="text"
-          className="form-control mb-2"
+        {errores && ( <p style={{color: 'red'}}>{errores}</p> )}
+        <select className="form-select mb-2" 
           value={turno.estado}
-          onChange={(e) =>
+          onChange={(e) => 
             setTurno({ ...turno, estado: e.target.value })
           }
-        />
-        {/* <input
-          type="text"
-          className="form-control mb-2"
-          value={turno.observaciones}
-          onChange={(e) =>
-            setTurno({ ...turno, observaciones: e.target.value })
-          }
-        /> */}
+          >
+            <option value="">Seleccione...</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="cancelado">Cancelado</option>
+        </select>
+        
         <button className="btn btn-primary" type="submit">
           Guardar cambios
         </button>

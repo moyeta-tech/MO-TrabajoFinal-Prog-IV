@@ -1,11 +1,12 @@
 import express from 'express'
 import { db } from '../config/db.js'
 import { verificarValidaciones, validarId, validarMedico } from '../validaciones.js'
+import { verificarAutenticacion } from './auth.js'
 
 const router = express.Router()
 
 
-router.get('/', async (req, res) => {
+router.get('/', verificarAutenticacion, async (req, res) => {
     const [rows] = await db.execute('SELECT * FROM medicos')
 
     if(rows.length === 0){
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
     return res.status(200).json({ success: true, medicos: rows })
 })
 
-router.get('/:id', validarId, verificarValidaciones, async (req, res) => {
+router.get('/:id', verificarAutenticacion, validarId, verificarValidaciones, async (req, res) => {
     const id = Number(req.params.id)
 
     let query = "SELECT * FROM medicos WHERE id = ?"
@@ -29,7 +30,7 @@ router.get('/:id', validarId, verificarValidaciones, async (req, res) => {
     return res.status(200).json({ success: true, medico: rows[0] })
 })
 
-router.post('/', validarMedico, verificarValidaciones, async (req, res) => {
+router.post('/', verificarAutenticacion, validarMedico, verificarValidaciones, async (req, res) => {
     const { nombre, apellido, especialidad, matricula } = req.body
     
     let query = "INSERT INTO medicos (nombre, apellido, \
@@ -40,7 +41,7 @@ router.post('/', validarMedico, verificarValidaciones, async (req, res) => {
     return res.status(200).json({ success: true, data: { id: rows.insertId, nombre, apellido, matricula } })
 })
 
-router.put('/:id', validarId, validarMedico, verificarValidaciones, async (req, res) => {
+router.put('/:id', verificarAutenticacion, validarId, validarMedico, verificarValidaciones, async (req, res) => {
     const id = Number(req.params.id)
     const { nombre, apellido, especialidad, matricula } = req.body
     
@@ -59,7 +60,7 @@ router.put('/:id', validarId, validarMedico, verificarValidaciones, async (req, 
 
 })
 
-router.delete('/:id', validarId, verificarValidaciones, async (req, res) => {
+router.delete('/:id', verificarAutenticacion, validarId, verificarValidaciones, async (req, res) => {
     const id = Number(req.params.id)
 
     const query = 'SELECT * FROM medicos WHERE id=?'
